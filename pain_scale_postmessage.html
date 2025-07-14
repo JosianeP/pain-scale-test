@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pain Scale Module</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 40px;
+    background-color: #f4f4f4;
+  }
+  h1 {
+    color: #333;
+  }
+  .pain-container {
+    margin: 30px auto;
+    width: 400px;
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  .pain-display {
+    font-size: 72px;
+    font-weight: bold;
+    color: #c0392b;
+    margin: 20px 0;
+  }
+  .face {
+    font-size: 72px;
+    margin: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="pain-container">
+    <h1>Pain Level</h1>
+    <div class="face" id="face">😐</div>
+    <div class="pain-display" id="pain">3</div>
+  </div>
+
+<script>
+let pain = 3;
+const painDisplay = document.getElementById('pain');
+const faceDisplay = document.getElementById('face');
+
+function updateDisplay() {
+  painDisplay.textContent = pain;
+  if (pain <= 2) {
+    faceDisplay.textContent = "🙂"; // positive
+  } else if (pain >= 5) {
+    faceDisplay.textContent = "😫"; // negative
+  } else {
+    faceDisplay.textContent = "😐"; // neutral
+  }
+}
+function changePain(delta) {
+  pain = Math.min(10, Math.max(0, pain + delta));
+  updateDisplay();
+}
+
+// Auto increase pain every 60 seconds
+setInterval(() => {
+  changePain(1);
+}, 60000);
+
+// Listen for messages from parent page
+window.addEventListener('message', (event) => {
+  // Accept messages only from the same origin or Genially (wildcard '*')
+  const data = event.data;
+  if (!data || !data.cmd) return;
+  switch (data.cmd) {
+    case 'decrease':
+      changePain(-1);
+      break;
+    case 'increase':
+      changePain(1);
+      break;
+    case 'reset':
+      pain = (typeof data.value === 'number') ? data.value : 0;
+      updateDisplay();
+      break;
+  }
+});
+updateDisplay();
+</script>
+</body>
+</html>
